@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Connect - Secure HIV Care Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+            }
+            50% { 
+                opacity: 0.5; 
+            }
+        }
+
+        .patient-tab-btn.active {
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .admin-tab-btn.active {
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            ring: 2px;
+            ring-color: #ef4444;
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Health Connect</h1>
+                <p class="text-gray-600 mt-2">Secure HIV Care Management System</p>
+                <div class="flex items-center justify-center mt-2 text-xs text-green-600">
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                    </svg>
+                    End-to-End Encrypted • HIPAA Compliant
+                </div>
+            </div>
+            
+            <!-- Login/Register Toggle -->
+            <div class="flex mb-6 bg-gray-100 rounded-lg p-1">
+                <button id="loginTab" onclick="showAuthTab('login')" class="flex-1 py-2 px-4 rounded-md text-sm font-medium bg-white text-red-600 shadow-sm">
+                    Sign In
+                </button>
+                <button id="registerTab" onclick="showAuthTab('register')" class="flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600 hover:text-gray-800">
+                    Sign Up
+                </button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginFormContainer">
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+                        <select id="userType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="patient">Patient Account</option>
+                            <option value="admin">Hospital Administrator</option>
+                            <option value="clinician">Healthcare Provider</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email or Phone</label>
+                        <input type="text" id="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Enter email or phone number">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Enter password">
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                            <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                        </label>
+                        <button type="button" onclick="showOTPLogin()" class="text-sm text-red-600 hover:text-red-500">Use OTP instead</button>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium">
+                        Sign In Securely
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center text-sm text-gray-500">
+                    <p>Demo Credentials:</p>
+                    <p>Patient: patient@demo.com / demo123</p>
+                    <p>Admin: admin@hospital.com / admin123</p>
+                </div>
+            </div>
+            
+            <!-- OTP Login Form -->
+            <div id="otpLoginContainer" class="hidden">
+                <form id="otpLoginForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input type="tel" id="otpPhone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="+1 (555) 123-4567">
+                    </div>
+                    
+                    <button type="button" onclick="sendOTP()" class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+                        Send OTP Code
+                    </button>
+                    
+                    <div id="otpInputSection" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Enter OTP Code</label>
+                        <input type="text" id="otpCode" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-center text-2xl tracking-widest" placeholder="000000" maxlength="6">
+                        <button type="submit" class="w-full mt-4 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-medium">
+                            Verify & Sign In
+                        </button>
+                    </div>
+                    
+                    <button type="button" onclick="showPasswordLogin()" class="w-full text-sm text-gray-600 hover:text-gray-800">
+                        ← Back to password login
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Registration Form -->
+            <div id="registerFormContainer" class="hidden">
+                <form id="registerForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+                        <select id="regUserType" name="userType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="patient">Patient Account</option>
+                            <option value="admin">Hospital Administrator</option>
+                            <option value="clinician">Healthcare Provider</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                            <input type="text" id="regFirstName" name="firstName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                            <input type="text" id="regLastName" name="lastName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input type="email" id="regEmail" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input type="tel" id="regPhone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="regPassword" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" required>
+                        <div class="mt-1 text-xs text-gray-500">
+                            Must contain: 8+ characters, uppercase, lowercase, number, special character
+                        </div>
+                    </div>
+                    
+                    <div id="adminFields" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Hospital/Clinic Name</label>
+                            <input type="text" id="regHospital" name="hospital" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Medical License Number</label>
+                            <input type="text" id="regLicense" name="license" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                            <select id="regRole" name="role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                <option value="admin">Hospital Administrator</option>
+                                <option value="doctor">Doctor</option>
+                                <option value="nurse">Nurse</option>
+                                <option value="pharmacist">Pharmacist</option>
+                                <option value="lab_tech">Lab Technician</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <label class="flex items-start">
+                            <input type="checkbox" id="regTerms" name="terms" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded mt-1" required>
+                            <span class="ml-2 text-sm text-gray-700">
+                                I agree to the <a href="#" class="text-red-600 hover:text-red-500">Terms of Service</a> and <a href="#" class="text-red-600 hover:text-red-500">Privacy Policy</a>
+                            </span>
+                        </label>
+                        
+                        <label class="flex items-start">
+                            <input type="checkbox" id="regHipaa" name="hipaa" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded mt-1" required>
+                            <span class="ml-2 text-sm text-gray-700">
+                                I acknowledge HIPAA compliance requirements and data handling policies
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium">
+                        Create Secure Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Dashboard -->
+    <div id="patientDashboard" class="hidden min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <span class="ml-3 text-xl font-bold text-gray-800">Health Connect</span>
+                        <div class="ml-4 flex items-center text-xs">
+                            <div class="w-2 h-2 bg-green-400 rounded-full mr-1 pulse"></div>
+                            <span class="text-gray-600">Secure Session Active</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-gray-800" id="patientName">John Doe</div>
+                            <div class="text-xs text-gray-500" id="patientId">ID: HIV-001247</div>
+                        </div>
+                        <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Clinical Overview Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Viral Load</p>
+                            <p class="text-2xl font-bold text-green-600">Undetectable</p>
+                            <p class="text-xs text-gray-500">Last: Nov 15, 2024</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">CD4 Count</p>
+                            <p class="text-2xl font-bold text-blue-600">650</p>
+                            <p class="text-xs text-gray-500">cells/μL</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">ART Adherence</p>
+                            <p class="text-2xl font-bold text-purple-600">94%</p>
+                            <p class="text-xs text-gray-500">30-day avg</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Next Visit</p>
+                            <p class="text-lg font-bold text-yellow-600">Dec 15</p>
+                            <p class="text-xs text-gray-500">Dr. Johnson</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Navigation -->
+            <div class="bg-white rounded-xl shadow-lg mb-8">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8 px-6">
+                        <button onclick="showPatientTab('profile')" class="patient-tab-btn py-4 px-1 border-b-2 border-red-500 font-medium text-sm text-red-600">
+                            Clinical Profile
+                        </button>
+                        <button onclick="showPatientTab('medical')" class="patient-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            Medical Records
+                        </button>
+                        <button onclick="showPatientTab('appointments')" class="patient-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            Appointments
+                        </button>
+                        <button onclick="showPatientTab('medications')" class="patient-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            Medications
+                        </button>
+                        <button onclick="showPatientTab('sharing')" class="patient-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            Record Sharing
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content Areas -->
+                <div id="profileTab" class="patient-tab-content p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Clinical Profile</h3>
+                        <div class="flex space-x-2">
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Data Encrypted</span>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">HIPAA Compliant</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Current ART Regimen -->
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h4 class="font-medium text-gray-800 mb-4">Current ART Regimen</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Primary Regimen:</span>
+                                    <span class="text-sm font-medium">EFV/FTC/TDF</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Started:</span>
+                                    <span class="text-sm font-medium">Jan 15, 2024</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Dosing:</span>
+                                    <span class="text-sm font-medium">Once daily at bedtime</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Adherence (30d):</span>
+                                    <span class="text-sm font-medium text-green-600">94%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lab Trends -->
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h4 class="font-medium text-gray-800 mb-4">Recent Lab Trends</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm text-gray-600">CD4 Count</span>
+                                        <span class="text-sm font-medium">650 cells/μL</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">Target: >500 cells/μL</div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm text-gray-600">Viral Load</span>
+                                        <span class="text-sm font-medium text-green-600">Undetectable</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">Target: <50 copies/mL</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="medicalTab" class="patient-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Medical Records</h3>
+                    <p class="text-gray-600">Medical records content will be displayed here...</p>
+                </div>
+
+                <div id="appointmentsTab" class="patient-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Appointments</h3>
+                    <p class="text-gray-600">Appointments content will be displayed here...</p>
+                </div>
+
+                <div id="medicationsTab" class="patient-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Medications</h3>
+                    <p class="text-gray-600">Medications content will be displayed here...</p>
+                </div>
+
+                <div id="sharingTab" class="patient-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Record Sharing</h3>
+                    <p class="text-gray-600">Record sharing content will be displayed here...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <span class="ml-3 text-xl font-bold text-gray-800">Health Connect - Admin</span>
+                        <div class="ml-4 flex items-center text-xs">
+                            <div class="w-2 h-2 bg-green-400 rounded-full mr-1 pulse"></div>
+                            <span class="text-gray-600">Secure Admin Session</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-gray-800">Dr. Sarah Johnson</div>
+                            <div class="text-xs text-gray-500">City General Hospital</div>
+                        </div>
+                        <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Admin Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Patients</p>
+                            <p class="text-2xl font-bold text-blue-600">1,247</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Active Treatments</p>
+                            <p class="text-2xl font-bold text-green-600">1,156</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">API Requests (24h)</p>
+                            <p class="text-2xl font-bold text-yellow-600">2,847</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Connected Hospitals</p>
+                            <p class="text-2xl font-bold text-purple-600">8</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Navigation -->
+            <div class="bg-white rounded-xl shadow-lg mb-8">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8 px-6">
+                        <button onclick="showAdminTab('patients')" class="admin-tab-btn py-4 px-1 border-b-2 border-red-500 font-medium text-sm text-red-600">
+                            Patient Management
+                        </button>
+                        <button onclick="showAdminTab('network')" class="admin-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            Hospital Network
+                        </button>
+                        <button onclick="showAdminTab('api')" class="admin-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            API Management
+                        </button>
+                        <button onclick="showAdminTab('audit')" class="admin-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            Audit Logs
+                        </button>
+                        <button onclick="showAdminTab('notifications')" class="admin-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
+                            Notifications
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Admin Tab Content Areas -->
+                <div id="patientsAdminTab" class="admin-tab-content p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Patient Management</h3>
+                    <p class="text-gray-600">Patient management content will be displayed here...</p>
+                </div>
+
+                <div id="networkAdminTab" class="admin-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Hospital Network</h3>
+                    <p class="text-gray-600">Hospital network content will be displayed here...</p>
+                </div>
+
+                <div id="apiAdminTab" class="admin-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">API Management</h3>
+                    <p class="text-gray-600">API management content will be displayed here...</p>
+                </div>
+
+                <div id="auditAdminTab" class="admin-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Audit Logs</h3>
+                    <p class="text-gray-600">Audit logs content will be displayed here...</p>
+                </div>
+
+                <div id="notificationsAdminTab" class="admin-tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Notifications</h3>
+                    <p class="text-gray-600">Notifications content will be displayed here...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        const AppState = {
+            currentUser: null,
+            currentView: 'login',
+            sessionToken: null,
+            isDemo: true
+        };
+
+        // Demo credentials
+        const demoCredentials = {
+            'patient@demo.com': { password: 'demo123', type: 'patient', name: 'John Doe', id: 'HIV-001247' },
+            'admin@hospital.com': { password: 'admin123', type: 'admin', name: 'Dr. Sarah Johnson', hospital: 'City General Hospital' }
+        };
+
+        // Utility Functions
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                type === 'warning' ? 'bg-yellow-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+
+        function showView(viewName) {
+            const views = ['loginScreen', 'patientDashboard', 'adminDashboard'];
+            views.forEach(view => {
+                const element = document.getElementById(view);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+
+            const targetView = document.getElementById(viewName + (viewName === 'login' ? 'Screen' : 'Dashboard'));
+            if (targetView) {
+                targetView.classList.remove('hidden');
+                AppState.currentView = viewName;
+            }
+        }
+
+        // Authentication Functions
+        function showAuthTab(tabName) {
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            const loginContainer = document.getElementById('loginFormContainer');
+            const registerContainer = document.getElementById('registerFormContainer');
+
+            if (tabName === 'login') {
+                loginTab.className = 'flex-1 py-2 px-4 rounded-md text-sm font-medium bg-white text-red-600 shadow-sm';
+                registerTab.className = 'flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600 hover:text-gray-800';
+                loginContainer.classList.remove('hidden');
+                registerContainer.classList.add('hidden');
+            } else {
+                registerTab.className = 'flex-1 py-2 px-4 rounded-md text-sm font-medium bg-white text-red-600 shadow-sm';
+                loginTab.className = 'flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600 hover:text-gray-800';
+                registerContainer.classList.remove('hidden');
+                loginContainer.classList.add('hidden');
+            }
+        }
+
+        function showOTPLogin() {
+            document.getElementById('loginFormContainer').classList.add('hidden');
+            document.getElementById('otpLoginContainer').classList.remove('hidden');
+        }
+
+        function showPasswordLogin() {
+            document.getElementById('otpLoginContainer').classList.add('hidden');
+            document.getElementById('loginFormContainer').classList.remove('hidden');
+        }
+
+        async function sendOTP() {
+            const phoneInput = document.getElementById('otpPhone');
+            const phone = phoneInput.value.trim();
+            
+            if (!phone) {
+                showNotification('Please enter a phone number', 'error');
+                return;
+            }
+
+            // Demo OTP
+            const otpCode = '123456';
+            console.log(`Demo OTP for ${phone}: ${otpCode}`);
+            showNotification(`Demo OTP: ${otpCode}`, 'info');
+            
+            document.getElementById('otpInputSection').classList.remove('hidden');
+        }
+
+        function showPatientTab(tabName) {
+            const tabButtons = document.querySelectorAll('.patient-tab-btn');
+            tabButtons.forEach(btn => {
+                btn.className = 'patient-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700';
+            });
+
+            const activeButton = document.querySelector(`[onclick="showPatientTab('${tabName}')"]`);
+            if (activeButton) {
+                activeButton.className = 'patient-tab-btn py-4 px-1 border-b-2 border-red-500 font-medium text-sm text-red-600';
+            }
+
+            const tabContents = document.querySelectorAll('.patient-tab-content');
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            const activeContent = document.getElementById(tabName + 'Tab');
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+        }
+
+        function showAdminTab(tabName) {
+            const tabButtons = document.querySelectorAll('.admin-tab-btn');
+            tabButtons.forEach(btn => {
+                btn.className = 'admin-tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700';
+            });
+
+            const activeButton = document.querySelector(`[onclick="showAdminTab('${tabName}')"]`);
+            if (activeButton) {
+                activeButton.className = 'admin-tab-btn py-4 px-1 border-b-2 border-red-500 font-medium text-sm text-red-600';
+            }
+
+            const tabContents = document.querySelectorAll('.admin-tab-content');
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            const activeContent = document.getElementById(tabName + 'AdminTab');
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            AppState.currentUser = null;
+            AppState.sessionToken = null;
+            showView('login');
+            showNotification('Logged out successfully', 'success');
+        }
+
+        function validatePassword(password) {
+            const minLength = 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumbers = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login form handler
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const userType = document.getElementById('userType').value;
+
+                    if (!username || !password) {
+                        showNotification('Please fill in all fields', 'error');
+                        return;
+                    }
+
+                    // Demo authentication
+                    if (demoCredentials[username] && demoCredentials[username].password === password && demoCredentials[username].type === userType) {
+                        const user = demoCredentials[username];
+                        AppState.currentUser = user;
+                        
+                        if (user.type === 'patient') {
+                            showView('patient');
+                            document.getElementById('patientName').textContent = user.name;
+                            document.getElementById('patientId').textContent = `ID: ${user.id}`;
+                        } else if (user.type === 'admin') {
+                            showView('admin');
+                        }
+                        
+                        showNotification('Login successful', 'success');
+                    } else {
+                        showNotification('Invalid credentials', 'error');
+                    }
+                });
+            }
+
+            // OTP form handler
+            const otpForm = document.getElementById('otpLoginForm');
+            if (otpForm) {
+                otpForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const phone = document.getElementById('otpPhone').value;
+                    const otpCode = document.getElementById('otpCode').value;
+
+                    if (otpCode === '123456') {
+                        const user = { type: 'patient', name: 'John Doe', id: 'HIV-001247', phone: phone };
+                        AppState.currentUser = user;
+                        showView('patient');
+                        document.getElementById('patientName').textContent = user.name;
+                        document.getElementById('patientId').textContent = `ID: ${user.id}`;
+                        showNotification('Login successful', 'success');
+                    } else {
+                        showNotification('Invalid OTP code', 'error');
+                    }
+                });
+            }
+
+            // Registration form handler
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    // Collect form data
+                    const userData = {
+                        userType: document.getElementById('regUserType').value,
+                        firstName: document.getElementById('regFirstName').value,
+                        lastName: document.getElementById('regLastName').value,
+                        email: document.getElementById('regEmail').value,
+                        phone: document.getElementById('regPhone').value,
+                        password: document.getElementById('regPassword').value,
+                        hospital: document.getElementById('regHospital').value,
+                        license: document.getElementById('regLicense').value,
+                        role: document.getElementById('regRole').value,
+                        terms: document.getElementById('regTerms').checked,
+                        hipaa: document.getElementById('regHipaa').checked
+                    };
+
+                    // Validate required fields
+                    if (!userData.firstName || !userData.lastName || !userData.email || !userData.phone || !userData.password) {
+                        showNotification('Please fill in all required fields', 'error');
+                        return;
+                    }
+
+                    // Validate email format
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(userData.email)) {
+                        showNotification('Please enter a valid email address', 'error');
+                        return;
+                    }
+
+                    // Validate password
+                    if (!validatePassword(userData.password)) {
+                        showNotification('Password must contain at least 8 characters with uppercase, lowercase, number, and special character', 'error');
+                        return;
+                    }
+
+                    // Validate checkboxes
+                    if (!userData.terms || !userData.hipaa) {
+                        showNotification('Please accept the terms and HIPAA requirements', 'error');
+                        return;
+                    }
+
+                    // Validate admin fields if needed
+                    if ((userData.userType === 'admin' || userData.userType === 'clinician') && (!userData.hospital || !userData.license)) {
+                        showNotification('Please fill in hospital and license information', 'error');
+                        return;
+                    }
+
+                    // Success
+                    showNotification('Account created successfully! Please sign in with your credentials.', 'success');
+                    showAuthTab('login');
+                    registerForm.reset();
+                });
+            }
+
+            // Show admin fields when admin/clinician is selected
+            const regUserType = document.getElementById('regUserType');
+            if (regUserType) {
+                regUserType.addEventListener('change', function() {
+                    const adminFields = document.getElementById('adminFields');
+                    if (this.value === 'admin' || this.value === 'clinician') {
+                        adminFields.classList.remove('hidden');
+                    } else {
+                        adminFields.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'984afed1818b8a34',t:'MTc1ODgwODI3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
